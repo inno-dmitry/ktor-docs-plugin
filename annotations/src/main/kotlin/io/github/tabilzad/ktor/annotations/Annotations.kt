@@ -47,3 +47,9 @@ annotation class KtorFieldDescription(
     val description: String = "",
     val required: Boolean = false
 )
+
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.FIELD)
+annotation class OpenApiFormat(
+    val value: String = ""
+)

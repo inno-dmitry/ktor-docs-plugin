@@ -18,6 +18,7 @@ dependencies {
     implementation(libs.moshi)
     implementation(libs.serialization)
     implementation(libs.bundles.ktor)
+    implementation(libs.datetime)
 
     testImplementation(libs.classGraph)
     testImplementation(libs.compilerTest)

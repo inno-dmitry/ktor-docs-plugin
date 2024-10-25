@@ -3,6 +3,7 @@ package io.github.tabilzad.ktor.k2.visitors
 import io.github.tabilzad.ktor.PluginConfiguration
 import io.github.tabilzad.ktor.annotations.KtorDescription
 import io.github.tabilzad.ktor.annotations.KtorFieldDescription
+import io.github.tabilzad.ktor.annotations.OpenApiFormat
 import io.github.tabilzad.ktor.getKDocComments
 import io.github.tabilzad.ktor.k1.visitors.KtorDescriptionBag
 import io.github.tabilzad.ktor.k1.visitors.toSwaggerType
@@ -44,7 +45,7 @@ internal class ClassDescriptorVisitorK2(
 ) : FirDefaultVisitor<ObjectType, ObjectType>() {
 
 
-    @OptIn(SealedClassInheritorsProviderInternals::class, SymbolInternals::class)
+    @OptIn(SealedClassInheritorsProviderInternals::class, SymbolInternals::class, PrivateForInline::class)
     override fun visitProperty(property: FirProperty, data: ObjectType): ObjectType {
         val coneTypeOrNull = property.returnTypeRef.coneTypeOrNull!!
         val type = if (coneTypeOrNull is ConeTypeParameterType && genericParameters.isNotEmpty()) {
@@ -71,6 +72,20 @@ internal class ClassDescriptorVisitorK2(
                     )
                     data.items = thisPrimitiveObj
                 }
+                data
+            }
+
+            type.fqNameStr() == "java.time.Instant" -> {
+                val formatAnnotation = property.findAnnotation(OpenApiFormat::class.simpleName)
+                val resolved = formatAnnotation?.let { FirExpressionEvaluator.evaluateAnnotationArguments(it, session) }
+                val format = resolved?.entries?.find { it.key.asString() == "value" }?.value?.result
+                data.addProperty(
+                    property,
+                    objectType = ObjectType(
+                        type = "string",
+                        format = format?.accept(StringResolutionVisitor(), "") ?: "iso 8601"
+                    ), session
+                )
                 data
             }
 
@@ -205,7 +220,7 @@ internal class ClassDescriptorVisitorK2(
                         data
                     }
 
-                    type.isValueClass(session) -> {
+                    type.type.isValueClass(session) -> {
                         data.addProperty(
                             property, ObjectType(
                                 type.properties(session)?.firstOrNull()?.resolvedReturnType?.className()
