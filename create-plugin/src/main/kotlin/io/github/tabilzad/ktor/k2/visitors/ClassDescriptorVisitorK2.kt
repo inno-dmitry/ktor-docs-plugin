@@ -105,6 +105,12 @@ internal class ClassDescriptorVisitorK2(
                                         )
                                     }
 
+                                    valueClassType.isMap -> {
+                                        acc.type = "object"
+                                        acc.additionalProperties = valueClassType.resolveItems()
+                                    }
+
+
                                     valueClassType.isAny -> {
                                         acc.type = "object"
                                     }
@@ -298,6 +304,11 @@ internal class ClassDescriptorVisitorK2(
             ObjectType("string").apply {
                 enum = typeSymbol?.resolveEnumEntries()
             }
+        } else if (type.isMap() && this.typeArguments.firstOrNull()?.type?.isString == true) {
+            ObjectType(
+                "object",
+                additionalProperties = this.typeArguments.lastOrNull()?.type?.resolveItems()
+            )
         } else {
             if (!classNames.names.contains(jetTypeFqName)) {
 
