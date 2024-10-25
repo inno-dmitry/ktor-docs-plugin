@@ -1,6 +1,6 @@
 package sources.requests
 
-import io.github.tabilzad.ktor.annotations.OpenApiFormat
+import io.github.tabilzad.ktor.annotations.OpenApiProperty
 import java.time.Instant
 
 data class SimpleRequest(
@@ -46,7 +46,7 @@ data class ComplexMapKey(
     val something: Int
 )
 
-data class InstantRequest(val date: Instant, @OpenApiFormat("date-time") val formattedInstant:Instant)
+data class InstantRequest(@OpenApiProperty(type = "string", format = "iso 8601") val date: Instant, @OpenApiProperty(type = "string", format = "date-time") val formattedInstant: Instant)
 
 enum class MyEnum {
     ONE,

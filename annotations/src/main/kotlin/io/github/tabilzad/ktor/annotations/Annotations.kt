@@ -50,6 +50,7 @@ annotation class KtorFieldDescription(
 
 @Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.FIELD)
-annotation class OpenApiFormat(
-    val value: String = ""
+annotation class OpenApiProperty(
+    val type : String = "",
+    val format: String = ""
 )
