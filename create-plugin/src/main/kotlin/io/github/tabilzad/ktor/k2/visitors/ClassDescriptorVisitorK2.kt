@@ -83,8 +83,8 @@ internal class ClassDescriptorVisitorK2(
                 data.addProperty(
                     property,
                     objectType = ObjectType(
-                        type = dataType?.accept(StringResolutionVisitor(), "") ?: "string",
-                        format = format?.accept(StringResolutionVisitor(), "") ?: "iso 8601"
+                        type = dataType?.accept(StringResolutionVisitor(), ""),
+                        format = format?.accept(StringResolutionVisitor(), "")
                     ), session
                 )
                 data
@@ -221,7 +221,7 @@ internal class ClassDescriptorVisitorK2(
                         data
                     }
 
-                    type.type.isValueClass(session) -> {
+                    type.isValueClass(session) -> {
                         data.addProperty(
                             property, ObjectType(
                                 type.properties(session)?.firstOrNull()?.resolvedReturnType?.className()
